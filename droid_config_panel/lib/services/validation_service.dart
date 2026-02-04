@@ -29,13 +29,6 @@ class ValidationService {
       case ConfigurationType.skill:
         _validateMarkdownWithFrontmatter(content, type, errors, warnings);
         break;
-      case ConfigurationType.agent:
-        if (content.trim().startsWith('---')) {
-          _validateMarkdownWithFrontmatter(content, type, errors, warnings);
-        } else {
-          _validateYaml(content, type, errors, warnings);
-        }
-        break;
       case ConfigurationType.hook:
       case ConfigurationType.mcpServer:
         _validateYaml(content, type, errors, warnings);
@@ -99,15 +92,6 @@ class ValidationService {
         severity: ValidationSeverity.warning,
       ));
     }
-
-    if (type == ConfigurationType.agent) {
-      if (!frontmatter.containsKey('subagent_type')) {
-        errors.add(const ValidationError(
-          message: 'Required field "subagent_type" is missing for Agent configuration',
-          severity: ValidationSeverity.error,
-        ));
-      }
-    }
   }
 
   void _validateYaml(
@@ -158,20 +142,6 @@ class ValidationService {
           ));
         }
         break;
-      case ConfigurationType.agent:
-        if (!parsed.containsKey('subagent_type')) {
-          errors.add(const ValidationError(
-            message: 'Required field "subagent_type" is missing for Agent configuration',
-            severity: ValidationSeverity.error,
-          ));
-        }
-        if (!parsed.containsKey('prompt')) {
-          errors.add(const ValidationError(
-            message: 'Required field "prompt" is missing for Agent configuration',
-            severity: ValidationSeverity.error,
-          ));
-        }
-        break;
       default:
         break;
     }
@@ -181,7 +151,6 @@ class ValidationService {
     final lowerPath = filePath.toLowerCase();
     if (lowerPath.contains('/droids/')) return ConfigurationType.droid;
     if (lowerPath.contains('/skills/')) return ConfigurationType.skill;
-    if (lowerPath.contains('/agents/')) return ConfigurationType.agent;
     if (lowerPath.contains('/hooks/')) return ConfigurationType.hook;
     if (lowerPath.contains('/mcp/')) return ConfigurationType.mcpServer;
     return ConfigurationType.droid;

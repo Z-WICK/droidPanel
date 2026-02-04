@@ -121,10 +121,6 @@ class ConfigListItem extends StatelessWidget {
         icon = Icons.psychology;
         color = Colors.purple;
         break;
-      case ConfigurationType.agent:
-        icon = Icons.support_agent;
-        color = Colors.green;
-        break;
       case ConfigurationType.hook:
         icon = Icons.webhook;
         color = Colors.orange;

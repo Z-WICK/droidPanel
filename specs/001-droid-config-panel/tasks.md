@@ -194,7 +194,7 @@ All paths relative to `droid_config_panel/` Flutter project root.
 - [x] T073 Handle edge case: display corrupted/unreadable files with error indicator
 - [x] T074 Add refresh button to reload configurations from disk
 - [ ] T075 Run quickstart.md validation scenarios manually
-- [ ] T076 Build release with `flutter build macos --release`
+- [x] T076 Build release with `flutter build macos --release`
 
 ---
 

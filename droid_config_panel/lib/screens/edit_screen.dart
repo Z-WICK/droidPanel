@@ -255,8 +255,6 @@ class _EditScreenState extends ConsumerState<EditScreen> {
         return Icons.smart_toy;
       case ConfigurationType.skill:
         return Icons.psychology;
-      case ConfigurationType.agent:
-        return Icons.support_agent;
       case ConfigurationType.hook:
         return Icons.webhook;
       case ConfigurationType.mcpServer:

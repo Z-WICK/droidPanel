@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:droid_config_panel/models/configuration.dart';
 import 'package:droid_config_panel/models/enums.dart';
 import 'package:droid_config_panel/models/exceptions.dart';
@@ -185,6 +186,16 @@ class ConfigService {
     ConfigurationType type,
     ConfigurationLocation location,
   ) async {
+    // Special handling for MCP servers (stored in mcp.json)
+    if (type == ConfigurationType.mcpServer) {
+      return _getMcpServerConfigurations(location);
+    }
+
+    // Special handling for Hooks (stored in hooks/hooks.json)
+    if (type == ConfigurationType.hook) {
+      return _getHookConfigurations(location);
+    }
+
     final configurations = <Configuration>[];
 
     try {
@@ -226,6 +237,71 @@ class ConfigService {
     return configurations;
   }
 
+  Future<List<Configuration>> _getMcpServerConfigurations(
+    ConfigurationLocation location,
+  ) async {
+    final configurations = <Configuration>[];
+
+    try {
+      final servers = await _fileService.listMcpServers(location: location);
+
+      for (final server in servers) {
+        final content = const JsonEncoder.withIndent('  ').convert(server.config);
+        final disabled = server.config['disabled'] == true;
+        final description = disabled ? '(Disabled)' : (server.config['type']?.toString() ?? 'stdio');
+
+        configurations.add(Configuration(
+          id: Configuration.generateId('${server.sourcePath}#${server.name}'),
+          name: server.name,
+          type: ConfigurationType.mcpServer,
+          description: description,
+          location: location,
+          filePath: server.sourcePath,
+          content: content,
+          status: disabled ? ValidationStatus.invalid : ValidationStatus.valid,
+          createdAt: DateTime.now(),
+          modifiedAt: DateTime.now(),
+        ));
+      }
+    } catch (_) {
+      // mcp.json doesn't exist or can't be read
+    }
+
+    return configurations;
+  }
+
+  Future<List<Configuration>> _getHookConfigurations(
+    ConfigurationLocation location,
+  ) async {
+    final configurations = <Configuration>[];
+
+    try {
+      final hooks = await _fileService.listHooks(location: location);
+
+      for (final hook in hooks) {
+        final content = const JsonEncoder.withIndent('  ').convert(hook.config);
+        final matcher = hook.config['matcher']?.toString() ?? '*';
+
+        configurations.add(Configuration(
+          id: Configuration.generateId('${hook.sourcePath}#${hook.name}'),
+          name: hook.name,
+          type: ConfigurationType.hook,
+          description: 'Event: ${hook.eventType}, Matcher: $matcher',
+          location: location,
+          filePath: hook.sourcePath,
+          content: content,
+          status: ValidationStatus.valid,
+          createdAt: DateTime.now(),
+          modifiedAt: DateTime.now(),
+        ));
+      }
+    } catch (_) {
+      // hooks.json doesn't exist or can't be read
+    }
+
+    return configurations;
+  }
+
   Configuration _parseConfiguration({
     required String filePath,
     required String content,
@@ -237,8 +313,7 @@ class ConfigService {
     String description = '';
 
     if (type == ConfigurationType.droid ||
-        type == ConfigurationType.skill ||
-        (type == ConfigurationType.agent && content.trim().startsWith('---'))) {
+        type == ConfigurationType.skill) {
       final parsed = YamlUtils.parseMarkdownWithFrontmatter(content);
       if (parsed.frontmatter != null) {
         name = parsed.frontmatter!['name']?.toString() ?? fileInfo.name;

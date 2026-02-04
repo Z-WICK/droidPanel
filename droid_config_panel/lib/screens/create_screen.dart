@@ -60,16 +60,6 @@ description: $description
 
 Skill instructions here.
 ''';
-      case ConfigurationType.agent:
-        return '''---
-name: $name
-description: $description
-subagent_type: custom
----
-
-prompt: |
-  Task prompt here.
-''';
       case ConfigurationType.hook:
         return '''name: $name
 description: $description

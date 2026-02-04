@@ -1,7 +1,6 @@
 enum ConfigurationType {
   droid,
   skill,
-  agent,
   hook,
   mcpServer;
 
@@ -11,8 +10,6 @@ enum ConfigurationType {
         return 'Droid';
       case ConfigurationType.skill:
         return 'Skill';
-      case ConfigurationType.agent:
-        return 'Agent';
       case ConfigurationType.hook:
         return 'Hook';
       case ConfigurationType.mcpServer:
@@ -26,8 +23,6 @@ enum ConfigurationType {
         return 'droids';
       case ConfigurationType.skill:
         return 'skills';
-      case ConfigurationType.agent:
-        return 'agents';
       case ConfigurationType.hook:
         return 'hooks';
       case ConfigurationType.mcpServer:
@@ -40,8 +35,6 @@ enum ConfigurationType {
       case ConfigurationType.droid:
       case ConfigurationType.skill:
         return ['.md'];
-      case ConfigurationType.agent:
-        return ['.md', '.yaml'];
       case ConfigurationType.hook:
       case ConfigurationType.mcpServer:
         return ['.yaml'];

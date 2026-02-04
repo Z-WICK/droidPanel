@@ -80,3 +80,6 @@ coverage/
 *.pyc
 __pycache__/
 .vscode/
+
+# Factory local config
+.factory/

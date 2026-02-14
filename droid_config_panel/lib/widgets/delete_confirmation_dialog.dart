@@ -22,16 +22,16 @@ class DeleteConfirmationDialog extends StatelessWidget {
             'Are you sure you want to delete this configuration?',
             style: theme.textTheme.bodyLarge,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
           GlassSurface(
-            borderRadius: 14,
+            borderRadius: 16,
             blur: 14,
             padding: const EdgeInsets.all(12),
             tintColor: theme.colorScheme.error.withValues(
-              alpha: isDark ? 0.16 : 0.08,
+              alpha: isDark ? 0.2 : 0.09,
             ),
             borderColor: theme.colorScheme.error.withValues(
-              alpha: isDark ? 0.6 : 0.4,
+              alpha: isDark ? 0.68 : 0.48,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -39,7 +39,7 @@ class DeleteConfirmationDialog extends StatelessWidget {
                 Row(
                   children: [
                     Icon(
-                      Icons.warning,
+                      Icons.warning_amber_rounded,
                       color: theme.colorScheme.error,
                       size: 20,
                     ),
@@ -47,7 +47,7 @@ class DeleteConfirmationDialog extends StatelessWidget {
                     Text(
                       configuration.name,
                       style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ],
@@ -64,12 +64,12 @@ class DeleteConfirmationDialog extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
           Text(
             'This action cannot be undone.',
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.error,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ],

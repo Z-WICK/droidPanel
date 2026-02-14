@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:droid_config_panel/models/validation_result.dart';
+
 import 'package:droid_config_panel/models/enums.dart';
+import 'package:droid_config_panel/models/validation_result.dart';
+import 'package:droid_config_panel/theme/app_theme.dart';
 import 'package:droid_config_panel/widgets/glass_surface.dart';
 
 class ValidationResultDisplay extends StatelessWidget {
@@ -20,24 +22,24 @@ class ValidationResultDisplay extends StatelessWidget {
 
     if (isValidating) {
       return GlassSurface(
-        borderRadius: 20,
-        blur: 20,
+        borderRadius: 18,
+        blur: 18,
         padding: const EdgeInsets.all(12),
         tintColor: theme.colorScheme.primary.withValues(
-          alpha: isDark ? 0.12 : 0.14,
+          alpha: isDark ? 0.2 : 0.12,
         ),
         borderColor: theme.colorScheme.primary.withValues(
-          alpha: isDark ? 0.5 : 0.38,
+          alpha: isDark ? 0.62 : 0.42,
         ),
         child: const Row(
           children: [
             SizedBox(
-              width: 16,
-              height: 16,
-              child: CircularProgressIndicator(strokeWidth: 2),
+              width: 17,
+              height: 17,
+              child: CircularProgressIndicator(strokeWidth: 2.2),
             ),
-            SizedBox(width: 12),
-            Text('Validating...'),
+            SizedBox(width: 10),
+            Text('Validating content...'),
           ],
         ),
       );
@@ -47,18 +49,18 @@ class ValidationResultDisplay extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    final isValid = result!.isValid;
     final hasWarnings = result!.warnings.isNotEmpty;
+    final isValid = result!.isValid;
     final accent = isValid
-        ? (hasWarnings ? const Color(0xFFDA7B13) : const Color(0xFF0EA76B))
+        ? (hasWarnings ? AppTheme.warning : AppTheme.success)
         : theme.colorScheme.error;
 
     return GlassSurface(
-      borderRadius: 20,
-      blur: 20,
-      padding: const EdgeInsets.all(12),
-      tintColor: accent.withValues(alpha: isDark ? 0.13 : 0.11),
-      borderColor: accent.withValues(alpha: isDark ? 0.62 : 0.48),
+      borderRadius: 18,
+      blur: 18,
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
+      tintColor: accent.withValues(alpha: isDark ? 0.18 : 0.1),
+      borderColor: accent.withValues(alpha: isDark ? 0.68 : 0.48),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -66,78 +68,83 @@ class ValidationResultDisplay extends StatelessWidget {
             children: [
               Icon(
                 isValid
-                    ? (hasWarnings ? Icons.warning : Icons.check_circle)
-                    : Icons.error,
+                    ? (hasWarnings
+                          ? Icons.warning_amber_rounded
+                          : Icons.check_circle_outline_rounded)
+                    : Icons.error_outline_rounded,
                 color: accent,
-                size: 20,
               ),
               const SizedBox(width: 8),
               Text(
                 isValid
-                    ? (hasWarnings ? 'Valid with warnings' : 'Valid')
-                    : 'Invalid',
+                    ? (hasWarnings
+                          ? 'Valid with warnings'
+                          : 'Validation passed')
+                    : 'Validation failed',
                 style: theme.textTheme.titleSmall?.copyWith(
                   color: accent,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ],
           ),
           if (result!.errors.isNotEmpty) ...[
             const SizedBox(height: 8),
-            for (final error in result!.errors) _buildMessageItem(error, theme),
+            for (final error in result!.errors) _MessageItem(error: error),
           ],
           if (result!.warnings.isNotEmpty) ...[
             const SizedBox(height: 8),
             for (final warning in result!.warnings)
-              _buildMessageItem(warning, theme),
+              _MessageItem(error: warning),
           ],
         ],
       ),
     );
   }
+}
 
-  Widget _buildMessageItem(ValidationError error, ThemeData theme) {
-    Color color;
-    IconData icon;
+class _MessageItem extends StatelessWidget {
+  final ValidationError error;
 
-    switch (error.severity) {
-      case ValidationSeverity.error:
-        color = Colors.red;
-        icon = Icons.error_outline;
-        break;
-      case ValidationSeverity.warning:
-        color = Colors.orange;
-        icon = Icons.warning_amber;
-        break;
-      case ValidationSeverity.info:
-        color = Colors.blue;
-        icon = Icons.info_outline;
-        break;
-    }
+  const _MessageItem({required this.error});
 
-    return Padding(
-      padding: const EdgeInsets.only(top: 4),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withValues(alpha: 0.3)),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(icon, size: 16, color: color),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                error.toString(),
-                style: theme.textTheme.bodySmall?.copyWith(color: color),
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color = switch (error.severity) {
+      ValidationSeverity.error => theme.colorScheme.error,
+      ValidationSeverity.warning => AppTheme.warning,
+      ValidationSeverity.info => AppTheme.info,
+    };
+    final icon = switch (error.severity) {
+      ValidationSeverity.error => Icons.error_outline_rounded,
+      ValidationSeverity.warning => Icons.warning_amber_rounded,
+      ValidationSeverity.info => Icons.info_outline_rounded,
+    };
+
+    return Container(
+      margin: const EdgeInsets.only(top: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: color.withValues(alpha: 0.34)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 16, color: color),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              error.toString(),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: color,
+                fontWeight: FontWeight.w600,
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -22,31 +22,36 @@ class EmptyState extends StatelessWidget {
 
     return Center(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(20),
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 560),
+          constraints: const BoxConstraints(maxWidth: 640),
           child: GlassSurface(
-            borderRadius: 28,
+            borderRadius: 24,
             blur: 28,
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(22),
             tintColor: theme.colorScheme.surface.withValues(
-              alpha: isDark ? 0.22 : 0.32,
+              alpha: isDark ? 0.44 : 0.88,
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  icon,
-                  size: 64,
-                  color: theme.colorScheme.onSurfaceVariant.withValues(
-                    alpha: 0.5,
+                Container(
+                  width: 72,
+                  height: 72,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary.withValues(
+                      alpha: isDark ? 0.24 : 0.14,
+                    ),
+                    borderRadius: BorderRadius.circular(20),
                   ),
+                  child: Icon(icon, size: 36, color: theme.colorScheme.primary),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 14),
                 Text(
                   title,
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    color: theme.colorScheme.onSurface,
+                    fontWeight: FontWeight.w700,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -55,14 +60,12 @@ class EmptyState extends StatelessWidget {
                   Text(
                     message!,
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant.withValues(
-                        alpha: 0.7,
-                      ),
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
                     textAlign: TextAlign.center,
                   ),
                 ],
-                if (action != null) ...[const SizedBox(height: 24), action!],
+                if (action != null) ...[const SizedBox(height: 20), action!],
               ],
             ),
           ),

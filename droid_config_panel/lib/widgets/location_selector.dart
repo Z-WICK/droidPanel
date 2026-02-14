@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:droid_config_panel/models/enums.dart';
 
 class LocationSelector extends StatelessWidget {
@@ -13,47 +14,112 @@ class LocationSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DropdownButtonFormField<ConfigurationLocation>(
-      key: ValueKey(selectedLocation),
-      initialValue: selectedLocation,
-      decoration: const InputDecoration(
-        labelText: 'Storage Location',
-        border: OutlineInputBorder(),
-      ),
-      items: ConfigurationLocation.values.map((location) {
-        return DropdownMenuItem(
-          value: location,
-          child: Row(
-            children: [
-              Icon(
-                location == ConfigurationLocation.project
-                    ? Icons.folder
-                    : Icons.home,
-                size: 20,
+    final theme = Theme.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Storage Location',
+          style: theme.textTheme.labelLarge?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            for (final location in ConfigurationLocation.values)
+              _LocationOption(
+                icon: location == ConfigurationLocation.project
+                    ? Icons.folder_outlined
+                    : Icons.person_outline_rounded,
+                label: location.displayName,
+                pathHint: location == ConfigurationLocation.project
+                    ? '.factory/'
+                    : '~/.factory/',
+                selected: selectedLocation == location,
+                onTap: () =>
+                    onChanged(selectedLocation == location ? null : location),
               ),
-              const SizedBox(width: 8),
-              Text(location.displayName),
-              const SizedBox(width: 8),
-              Text(
-                location == ConfigurationLocation.project
-                    ? '(.factory/)'
-                    : '(~/.factory/)',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  fontSize: 12,
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _LocationOption extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String pathHint;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _LocationOption({
+    required this.icon,
+    required this.label,
+    required this.pathHint,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(12),
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 160),
+        constraints: const BoxConstraints(minWidth: 170),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+        decoration: BoxDecoration(
+          color: selected
+              ? theme.colorScheme.primary.withValues(alpha: 0.14)
+              : theme.colorScheme.surfaceContainer.withValues(alpha: 0.74),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: selected
+                ? theme.colorScheme.primary.withValues(alpha: 0.76)
+                : theme.colorScheme.outlineVariant.withValues(alpha: 0.64),
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              size: 16,
+              color: selected
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.onSurfaceVariant,
+            ),
+            const SizedBox(width: 7),
+            Expanded(
+              child: Text(
+                label,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: selected
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onSurfaceVariant,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
-            ],
-          ),
-        );
-      }).toList(),
-      onChanged: onChanged,
-      validator: (value) {
-        if (value == null) {
-          return 'Please select a storage location';
-        }
-        return null;
-      },
+            ),
+            Text(
+              pathHint,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant.withValues(
+                  alpha: 0.85,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

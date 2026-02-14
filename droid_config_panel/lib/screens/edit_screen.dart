@@ -339,202 +339,224 @@ class _EditScreenState extends ConsumerState<EditScreen> {
               padding: const EdgeInsets.all(16),
               child: Center(
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 1120),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        EntranceTransition(
-                          delay: const Duration(milliseconds: 20),
-                          child: GlassSurface(
-                            borderRadius: 26,
-                            blur: 30,
-                            tintColor: theme.colorScheme.surface.withValues(
-                              alpha: isDark ? 0.24 : 0.35,
-                            ),
-                            padding: const EdgeInsets.all(16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                LayoutBuilder(
-                                  builder: (context, constraints) {
-                                    final isCompact =
-                                        constraints.maxWidth < 760;
-                                    if (isCompact) {
-                                      return Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            'Configuration Details',
-                                            style: theme.textTheme.titleMedium
-                                                ?.copyWith(
-                                                  fontWeight: FontWeight.w700,
-                                                ),
-                                          ),
-                                          const SizedBox(height: 10),
-                                          Wrap(
-                                            spacing: 8,
-                                            runSpacing: 8,
-                                            children: [
-                                              Chip(
-                                                avatar: Icon(
-                                                  _iconForType(
-                                                    widget.configuration.type,
-                                                  ),
-                                                  size: 16,
-                                                ),
-                                                label: Text(
-                                                  widget
-                                                      .configuration
-                                                      .type
-                                                      .displayName,
-                                                ),
-                                              ),
-                                              Chip(
-                                                label: Text(
-                                                  widget
-                                                      .configuration
-                                                      .location
-                                                      .displayName,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      );
-                                    }
+                  constraints: const BoxConstraints(maxWidth: 1240),
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final compact = constraints.maxWidth < 980;
+                      final metaPanel = _buildMetaPanel(theme, isDark);
+                      final editorPanel = _buildEditorPanel(
+                        theme,
+                        isDark,
+                        compact: compact,
+                      );
 
-                                    return Row(
-                                      children: [
-                                        Text(
-                                          'Configuration Details',
-                                          style: theme.textTheme.titleMedium
-                                              ?.copyWith(
-                                                fontWeight: FontWeight.w700,
-                                              ),
-                                        ),
-                                        const Spacer(),
-                                        Chip(
-                                          avatar: Icon(
-                                            _iconForType(
-                                              widget.configuration.type,
-                                            ),
-                                            size: 16,
-                                          ),
-                                          label: Text(
-                                            widget
-                                                .configuration
-                                                .type
-                                                .displayName,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Chip(
-                                          label: Text(
-                                            widget
-                                                .configuration
-                                                .location
-                                                .displayName,
-                                          ),
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                ),
-                                const SizedBox(height: 14),
-                                TextFormField(
-                                  controller: _nameController,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Name',
-                                    border: OutlineInputBorder(),
+                      if (compact) {
+                        return SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              metaPanel,
+                              const SizedBox(height: 12),
+                              if (_validationResult != null || _isValidating)
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 12),
+                                  child: ValidationResultDisplay(
+                                    result: _validationResult,
+                                    isValidating: _isValidating,
                                   ),
                                 ),
-                                const SizedBox(height: 12),
-                                TextFormField(
-                                  controller: _descriptionController,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Description',
-                                    border: OutlineInputBorder(),
-                                  ),
-                                  maxLines: 2,
-                                ),
-                              ],
-                            ),
+                              editorPanel,
+                            ],
                           ),
-                        ),
-                        const SizedBox(height: 14),
-                        if (_validationResult != null || _isValidating)
-                          EntranceTransition(
-                            delay: const Duration(milliseconds: 70),
-                            child: Padding(
-                              padding: const EdgeInsets.only(bottom: 14),
-                              child: ValidationResultDisplay(
-                                result: _validationResult,
-                                isValidating: _isValidating,
-                              ),
-                            ),
-                          ),
-                        EntranceTransition(
-                          delay: const Duration(milliseconds: 120),
-                          child: GlassSurface(
-                            borderRadius: 26,
-                            blur: 32,
-                            tintColor: theme.colorScheme.surface.withValues(
-                              alpha: isDark ? 0.22 : 0.33,
-                            ),
-                            padding: const EdgeInsets.all(16),
+                        );
+                      }
+
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(width: 380, child: metaPanel),
+                          const SizedBox(width: 12),
+                          Expanded(
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                Row(
-                                  children: [
-                                    Text(
-                                      'Configuration Content',
-                                      style: theme.textTheme.titleMedium
-                                          ?.copyWith(
-                                            fontWeight: FontWeight.w700,
-                                          ),
+                                if (_validationResult != null || _isValidating)
+                                  Padding(
+                                    padding: const EdgeInsets.only(bottom: 12),
+                                    child: ValidationResultDisplay(
+                                      result: _validationResult,
+                                      isValidating: _isValidating,
                                     ),
-                                    const Spacer(),
-                                    if (_hasChanges)
-                                      Text(
-                                        'Unsaved changes',
-                                        style: theme.textTheme.labelMedium
-                                            ?.copyWith(
-                                              color: theme.colorScheme.primary,
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                      ),
-                                  ],
-                                ),
-                                const SizedBox(height: 12),
-                                SizedBox(
-                                  height: 420,
-                                  child: CodeEditorWidget(
-                                    initialContent: _content,
-                                    onChanged: (value) {
-                                      _content = value;
-                                      _markAsChanged();
-                                      if (_validationResult != null) {
-                                        setState(
-                                          () => _validationResult = null,
-                                        );
-                                      }
-                                    },
                                   ),
-                                ),
+                                Expanded(child: editorPanel),
                               ],
                             ),
                           ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      );
+                    },
                   ),
                 ),
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMetaPanel(ThemeData theme, bool isDark) {
+    return EntranceTransition(
+      delay: const Duration(milliseconds: 20),
+      child: GlassSurface(
+        borderRadius: 22,
+        blur: 28,
+        tintColor: theme.colorScheme.surface.withValues(
+          alpha: isDark ? 0.54 : 0.88,
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Configuration Details',
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                if (_hasChanges)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary.withValues(alpha: 0.14),
+                      borderRadius: BorderRadius.circular(999),
+                      border: Border.all(
+                        color: theme.colorScheme.primary.withValues(
+                          alpha: 0.32,
+                        ),
+                      ),
+                    ),
+                    child: Text(
+                      'Unsaved',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.primary,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                Chip(
+                  avatar: Icon(
+                    _iconForType(widget.configuration.type),
+                    size: 16,
+                  ),
+                  label: Text(widget.configuration.type.displayName),
+                ),
+                Chip(label: Text(widget.configuration.location.displayName)),
+              ],
+            ),
+            const SizedBox(height: 14),
+            TextFormField(
+              controller: _nameController,
+              decoration: const InputDecoration(
+                labelText: 'Name',
+                hintText: 'Configuration name',
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _descriptionController,
+              decoration: const InputDecoration(
+                labelText: 'Description',
+                hintText: 'What this configuration does',
+              ),
+              minLines: 2,
+              maxLines: 3,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              widget.configuration.filePath,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEditorPanel(
+    ThemeData theme,
+    bool isDark, {
+    required bool compact,
+  }) {
+    return EntranceTransition(
+      delay: const Duration(milliseconds: 90),
+      child: GlassSurface(
+        borderRadius: 22,
+        blur: 30,
+        tintColor: theme.colorScheme.surface.withValues(
+          alpha: isDark ? 0.5 : 0.86,
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              'Configuration Content',
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Shortcut: ⌘Enter validate, ⌘S save',
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 12),
+            if (compact)
+              SizedBox(
+                height: 460,
+                child: CodeEditorWidget(
+                  initialContent: _content,
+                  onChanged: (value) {
+                    _content = value;
+                    _markAsChanged();
+                    if (_validationResult != null) {
+                      setState(() => _validationResult = null);
+                    }
+                  },
+                ),
+              )
+            else
+              Expanded(
+                child: CodeEditorWidget(
+                  initialContent: _content,
+                  onChanged: (value) {
+                    _content = value;
+                    _markAsChanged();
+                    if (_validationResult != null) {
+                      setState(() => _validationResult = null);
+                    }
+                  },
+                ),
+              ),
+          ],
         ),
       ),
     );

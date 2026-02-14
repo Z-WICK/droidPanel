@@ -256,181 +256,202 @@ Skill instructions here.
             padding: const EdgeInsets.all(16),
             child: Center(
               child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 1120),
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      EntranceTransition(
-                        delay: const Duration(milliseconds: 20),
-                        child: GlassSurface(
-                          borderRadius: 26,
-                          blur: 30,
-                          tintColor: theme.colorScheme.surface.withValues(
-                            alpha: isDark ? 0.24 : 0.35,
-                          ),
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Text(
-                                'Basic Information',
-                                style: theme.textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              const SizedBox(height: 14),
-                              LayoutBuilder(
-                                builder: (context, constraints) {
-                                  final isCompact = constraints.maxWidth < 760;
-                                  if (isCompact) {
-                                    return Column(
-                                      children: [
-                                        TypeSelector(
-                                          selectedType: _selectedType,
-                                          onChanged: (type) {
-                                            setState(() {
-                                              _selectedType = type;
-                                              if (type != null) {
-                                                _content = _getDefaultContent(
-                                                  type,
-                                                );
-                                              }
-                                              _validationResult = null;
-                                            });
-                                          },
-                                        ),
-                                        const SizedBox(height: 12),
-                                        LocationSelector(
-                                          selectedLocation: _selectedLocation,
-                                          onChanged: (location) {
-                                            setState(
-                                              () =>
-                                                  _selectedLocation = location,
-                                            );
-                                          },
-                                        ),
-                                      ],
-                                    );
-                                  }
+                constraints: const BoxConstraints(maxWidth: 1240),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final compact = constraints.maxWidth < 980;
+                    final metaColumn = _buildMetaPanel(theme, isDark);
+                    final editorPanel = _buildEditorPanel(
+                      theme,
+                      isDark,
+                      compact: compact,
+                    );
 
-                                  return Row(
-                                    children: [
-                                      Expanded(
-                                        child: TypeSelector(
-                                          selectedType: _selectedType,
-                                          onChanged: (type) {
-                                            setState(() {
-                                              _selectedType = type;
-                                              if (type != null) {
-                                                _content = _getDefaultContent(
-                                                  type,
-                                                );
-                                              }
-                                              _validationResult = null;
-                                            });
-                                          },
-                                        ),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      Expanded(
-                                        child: LocationSelector(
-                                          selectedLocation: _selectedLocation,
-                                          onChanged: (location) {
-                                            setState(
-                                              () =>
-                                                  _selectedLocation = location,
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              ),
-                              const SizedBox(height: 14),
-                              ConfigForm(
-                                formKey: _formKey,
-                                nameController: _nameController,
-                                descriptionController: _descriptionController,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 14),
-                      if (_validationResult != null || _isValidating)
-                        EntranceTransition(
-                          delay: const Duration(milliseconds: 70),
-                          child: Padding(
-                            padding: const EdgeInsets.only(bottom: 14),
-                            child: ValidationResultDisplay(
-                              result: _validationResult,
-                              isValidating: _isValidating,
-                            ),
-                          ),
-                        ),
-                      EntranceTransition(
-                        delay: const Duration(milliseconds: 120),
-                        child: GlassSurface(
-                          borderRadius: 26,
-                          blur: 32,
-                          tintColor: theme.colorScheme.surface.withValues(
-                            alpha: isDark ? 0.22 : 0.33,
-                          ),
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    'Configuration Content',
-                                    style: theme.textTheme.titleMedium
-                                        ?.copyWith(fontWeight: FontWeight.w700),
-                                  ),
-                                  const Spacer(),
-                                  if (_selectedType != null)
-                                    TextButton.icon(
-                                      onPressed: () {
-                                        setState(() {
-                                          _content = _getDefaultContent(
-                                            _selectedType!,
-                                          );
-                                          _validationResult = null;
-                                        });
-                                      },
-                                      icon: const Icon(
-                                        Icons.restart_alt,
-                                        size: 18,
-                                      ),
-                                      label: const Text('Reset Template'),
-                                    ),
-                                ],
-                              ),
-                              const SizedBox(height: 12),
-                              SizedBox(
-                                height: 420,
-                                child: CodeEditorWidget(
-                                  initialContent: _content,
-                                  onChanged: (value) {
-                                    _content = value;
-                                    if (_validationResult != null) {
-                                      setState(() => _validationResult = null);
-                                    }
-                                  },
+                    if (compact) {
+                      return SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            metaColumn,
+                            const SizedBox(height: 12),
+                            if (_validationResult != null || _isValidating)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 12),
+                                child: ValidationResultDisplay(
+                                  result: _validationResult,
+                                  isValidating: _isValidating,
                                 ),
                               ),
+                            editorPanel,
+                          ],
+                        ),
+                      );
+                    }
+
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(width: 380, child: metaColumn),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            children: [
+                              if (_validationResult != null || _isValidating)
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 12),
+                                  child: ValidationResultDisplay(
+                                    result: _validationResult,
+                                    isValidating: _isValidating,
+                                  ),
+                                ),
+                              Expanded(child: editorPanel),
                             ],
                           ),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    );
+                  },
                 ),
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMetaPanel(ThemeData theme, bool isDark) {
+    return EntranceTransition(
+      delay: const Duration(milliseconds: 20),
+      child: GlassSurface(
+        borderRadius: 22,
+        blur: 28,
+        tintColor: theme.colorScheme.surface.withValues(
+          alpha: isDark ? 0.54 : 0.88,
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              'Setup',
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              'Define type, location and metadata first.',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 14),
+            TypeSelector(
+              selectedType: _selectedType,
+              onChanged: (type) {
+                setState(() {
+                  _selectedType = type;
+                  if (type != null) {
+                    _content = _getDefaultContent(type);
+                  }
+                  _validationResult = null;
+                });
+              },
+            ),
+            const SizedBox(height: 12),
+            LocationSelector(
+              selectedLocation: _selectedLocation,
+              onChanged: (location) {
+                setState(() => _selectedLocation = location);
+              },
+            ),
+            const SizedBox(height: 14),
+            ConfigForm(
+              formKey: _formKey,
+              nameController: _nameController,
+              descriptionController: _descriptionController,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEditorPanel(
+    ThemeData theme,
+    bool isDark, {
+    required bool compact,
+  }) {
+    return EntranceTransition(
+      delay: const Duration(milliseconds: 90),
+      child: GlassSurface(
+        borderRadius: 22,
+        blur: 30,
+        tintColor: theme.colorScheme.surface.withValues(
+          alpha: isDark ? 0.5 : 0.86,
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Configuration Content',
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                if (_selectedType != null)
+                  TextButton.icon(
+                    onPressed: () {
+                      setState(() {
+                        _content = _getDefaultContent(_selectedType!);
+                        _validationResult = null;
+                      });
+                    },
+                    icon: const Icon(Icons.restart_alt_rounded, size: 17),
+                    label: const Text('Reset Template'),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Shortcut: ⌘Enter validate, ⌘S save',
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 12),
+            if (compact)
+              SizedBox(
+                height: 460,
+                child: CodeEditorWidget(
+                  initialContent: _content,
+                  onChanged: (value) {
+                    _content = value;
+                    if (_validationResult != null) {
+                      setState(() => _validationResult = null);
+                    }
+                  },
+                ),
+              )
+            else
+              Expanded(
+                child: CodeEditorWidget(
+                  initialContent: _content,
+                  onChanged: (value) {
+                    _content = value;
+                    if (_validationResult != null) {
+                      setState(() => _validationResult = null);
+                    }
+                  },
+                ),
+              ),
+          ],
         ),
       ),
     );

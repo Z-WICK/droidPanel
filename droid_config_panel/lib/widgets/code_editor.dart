@@ -57,21 +57,21 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
     final isDark = theme.brightness == Brightness.dark;
 
     return GlassSurface(
-      borderRadius: 18,
-      blur: 18,
+      borderRadius: 16,
+      blur: 16,
       showInnerGlow: false,
       padding: const EdgeInsets.all(1.2),
-      tintColor: theme.colorScheme.surface.withValues(
-        alpha: isDark ? 0.28 : 0.4,
+      tintColor: theme.colorScheme.surfaceContainer.withValues(
+        alpha: isDark ? 0.64 : 0.96,
       ),
       borderColor: theme.colorScheme.outlineVariant.withValues(
-        alpha: isDark ? 0.56 : 0.48,
+        alpha: isDark ? 0.7 : 0.72,
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14),
         child: ColoredBox(
           color: theme.colorScheme.surface.withValues(
-            alpha: isDark ? 0.52 : 0.66,
+            alpha: isDark ? 0.72 : 0.96,
           ),
           child: CodeEditor(
             controller: _controller,

@@ -12,6 +12,7 @@ class GlassSurface extends StatelessWidget {
   final Color? borderColor;
   final List<Color>? gradientColors;
   final bool showInnerGlow;
+  final double shadowOpacity;
 
   const GlassSurface({
     super.key,
@@ -19,11 +20,12 @@ class GlassSurface extends StatelessWidget {
     this.padding,
     this.margin,
     this.borderRadius = 24,
-    this.blur = 26,
+    this.blur = 18,
     this.tintColor,
     this.borderColor,
     this.gradientColors,
     this.showInnerGlow = true,
+    this.shadowOpacity = 1,
   });
 
   @override
@@ -38,19 +40,21 @@ class GlassSurface extends StatelessWidget {
     final resolvedBorderColor =
         borderColor ??
         theme.colorScheme.outlineVariant.withValues(
-          alpha: isDark ? 0.38 : 0.45,
+          alpha: isDark ? 0.46 : 0.52,
         );
 
     final colors =
         gradientColors ??
         [
-          Colors.white.withValues(alpha: isDark ? 0.12 : 0.6),
-          Colors.white.withValues(alpha: isDark ? 0.08 : 0.28),
+          Colors.white.withValues(alpha: isDark ? 0.08 : 0.58),
+          Colors.white.withValues(alpha: isDark ? 0.02 : 0.26),
         ];
 
     final resolvedTintColor =
         tintColor ??
-        theme.colorScheme.surface.withValues(alpha: isDark ? 0.24 : 0.3);
+        theme.colorScheme.surfaceContainer.withValues(
+          alpha: isDark ? 0.7 : 0.94,
+        );
 
     final colorBoost = highContrast ? (isDark ? 0.12 : 0.14) : 0.0;
     final borderBoost = highContrast ? 0.18 : 0.0;
@@ -85,9 +89,11 @@ class GlassSurface extends StatelessWidget {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Colors.white.withValues(alpha: isDark ? 0.09 : 0.28),
-                        Colors.transparent,
+                        Colors.white.withValues(alpha: isDark ? 0.08 : 0.18),
+                        Colors.white.withValues(alpha: isDark ? 0.02 : 0.06),
+                        Colors.transparent.withValues(alpha: 0.4),
                       ],
+                      stops: const [0, 0.35, 1],
                     ),
                   ),
                 ),
@@ -104,10 +110,12 @@ class GlassSurface extends StatelessWidget {
         borderRadius: radius,
         boxShadow: [
           BoxShadow(
-            blurRadius: isDark ? 34 : 24,
-            spreadRadius: -16,
-            offset: const Offset(0, 18),
-            color: Colors.black.withValues(alpha: isDark ? 0.42 : 0.16),
+            blurRadius: isDark ? 22 : 16,
+            spreadRadius: -10,
+            offset: const Offset(0, 10),
+            color: Colors.black.withValues(
+              alpha: (isDark ? 0.2 : 0.06) * shadowOpacity,
+            ),
           ),
         ],
       ),

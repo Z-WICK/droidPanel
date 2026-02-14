@@ -32,120 +32,121 @@ class FilterChips extends StatelessWidget {
     final theme = Theme.of(context);
 
     return GlassSurface(
-      borderRadius: 22,
-      blur: 28,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      borderRadius: 16,
+      blur: 20,
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      child: Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        crossAxisAlignment: WrapCrossAlignment.center,
         children: [
-          Row(
-            children: [
-              Text(
-                'Filters',
-                style: theme.textTheme.labelLarge?.copyWith(
-                  fontWeight: FontWeight.w700,
+          _FilterMenuButton<ConfigurationType>(
+            label: 'Type',
+            selectedText: selectedType?.displayName ?? 'All',
+            values: ConfigurationType.values,
+            valueLabel: (value) => value.displayName,
+            onSelected: onTypeChanged,
+          ),
+          _FilterMenuButton<ConfigurationLocation>(
+            label: 'Location',
+            selectedText: selectedLocation?.displayName ?? 'All',
+            values: ConfigurationLocation.values,
+            valueLabel: (value) => value.displayName,
+            onSelected: onLocationChanged,
+          ),
+          _FilterMenuButton<ValidationStatus>(
+            label: 'Status',
+            selectedText: selectedStatus?.displayName ?? 'All',
+            values: ValidationStatus.values,
+            valueLabel: (value) => value.displayName,
+            onSelected: onStatusChanged,
+          ),
+          if (hasFilters)
+            TextButton.icon(
+              onPressed: onClearAll,
+              icon: const Icon(Icons.filter_alt_off_rounded, size: 16),
+              label: const Text('Clear'),
+              style: TextButton.styleFrom(
+                visualDensity: VisualDensity.compact,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 8,
                 ),
               ),
-              const Spacer(),
-              if (hasFilters)
-                ActionChip(
-                  avatar: const Icon(Icons.clear, size: 16),
-                  label: const Text('Clear'),
-                  onPressed: onClearAll,
-                  visualDensity: VisualDensity.compact,
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 10,
-            runSpacing: 8,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              _GroupLabel(text: 'Type'),
-              for (final type in ConfigurationType.values)
-                _CompactFilterChip(
-                  text: type.displayName,
-                  selected: selectedType == type,
-                  onSelected: () =>
-                      onTypeChanged?.call(selectedType == type ? null : type),
-                ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 10,
-            runSpacing: 8,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              _GroupLabel(text: 'Location'),
-              for (final location in ConfigurationLocation.values)
-                _CompactFilterChip(
-                  text: location.displayName,
-                  selected: selectedLocation == location,
-                  onSelected: () => onLocationChanged?.call(
-                    selectedLocation == location ? null : location,
-                  ),
-                ),
-              const SizedBox(width: 8),
-              _GroupLabel(text: 'Status'),
-              for (final status in ValidationStatus.values)
-                _CompactFilterChip(
-                  text: status.displayName,
-                  selected: selectedStatus == status,
-                  onSelected: () => onStatusChanged?.call(
-                    selectedStatus == status ? null : status,
-                  ),
-                ),
-            ],
-          ),
+            )
+          else
+            Text(
+              'No active filters',
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
         ],
       ),
     );
   }
 }
 
-class _GroupLabel extends StatelessWidget {
-  final String text;
+class _FilterMenuButton<T> extends StatelessWidget {
+  final String label;
+  final String selectedText;
+  final List<T> values;
+  final String Function(T value) valueLabel;
+  final ValueChanged<T?>? onSelected;
 
-  const _GroupLabel({required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Text(
-      text,
-      style: theme.textTheme.labelMedium?.copyWith(
-        color: theme.colorScheme.onSurfaceVariant,
-        fontWeight: FontWeight.w700,
-      ),
-    );
-  }
-}
-
-class _CompactFilterChip extends StatelessWidget {
-  final String text;
-  final bool selected;
-  final VoidCallback onSelected;
-
-  const _CompactFilterChip({
-    required this.text,
-    required this.selected,
+  const _FilterMenuButton({
+    required this.label,
+    required this.selectedText,
+    required this.values,
+    required this.valueLabel,
     required this.onSelected,
   });
 
   @override
   Widget build(BuildContext context) {
-    return FilterChip(
-      label: Text(text),
-      selected: selected,
-      onSelected: (_) => onSelected(),
-      visualDensity: VisualDensity.compact,
-      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      labelPadding: const EdgeInsets.symmetric(horizontal: 4),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+    final theme = Theme.of(context);
+
+    return PopupMenuButton<T?>(
+      tooltip: '$label filter',
+      onSelected: onSelected,
+      itemBuilder: (context) {
+        return [
+          PopupMenuItem<T?>(value: null, child: Text('$label: All')),
+          for (final value in values)
+            PopupMenuItem<T?>(
+              value: value,
+              child: Text('$label: ${valueLabel(value)}'),
+            ),
+        ];
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surfaceContainer.withValues(alpha: 0.8),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.66),
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              '$label: $selectedText',
+              style: theme.textTheme.labelMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(width: 6),
+            Icon(
+              Icons.expand_more_rounded,
+              size: 16,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

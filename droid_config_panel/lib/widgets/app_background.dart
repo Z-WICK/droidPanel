@@ -20,43 +20,36 @@ class AppBackground extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          begin: const Alignment(-0.9, -1),
-          end: const Alignment(0.95, 1),
+          begin: const Alignment(-0.3, -1),
+          end: const Alignment(0.7, 1),
           colors: isDark
               ? [
-                  const Color(0xFF070B13),
-                  const Color(0xFF101A2A),
-                  const Color(0xFF0A111D),
+                  const Color(0xFF0F1923),
+                  const Color(0xFF142130),
+                  const Color(0xFF101B27),
                 ]
               : [
-                  const Color(0xFFEAF1FF),
-                  const Color(0xFFF3F8FF),
-                  const Color(0xFFE9EFFA),
+                  const Color(0xFFF9FCFF),
+                  const Color(0xFFF3F8FD),
+                  const Color(0xFFEEF5FC),
                 ],
         ),
       ),
       child: Stack(
         children: [
           _GlowOrb(
-            alignment: const Alignment(-0.85, -0.95),
+            alignment: const Alignment(-0.9, -0.95),
             color: theme.colorScheme.primary.withValues(
-              alpha: isDark ? 0.21 : 0.2,
+              alpha: isDark ? 0.14 : 0.12,
             ),
-            size: 340,
+            size: 300,
           ),
           _GlowOrb(
-            alignment: const Alignment(1.05, -0.55),
+            alignment: const Alignment(1.05, -0.7),
             color: theme.colorScheme.tertiary.withValues(
-              alpha: isDark ? 0.15 : 0.13,
+              alpha: isDark ? 0.1 : 0.08,
             ),
-            size: 280,
-          ),
-          _GlowOrb(
-            alignment: const Alignment(0.78, 0.95),
-            color: theme.colorScheme.secondary.withValues(
-              alpha: isDark ? 0.14 : 0.1,
-            ),
-            size: 360,
+            size: 240,
           ),
           Positioned.fill(
             child: IgnorePointer(
@@ -66,9 +59,9 @@ class AppBackground extends StatelessWidget {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Colors.white.withValues(alpha: isDark ? 0.03 : 0.25),
+                      Colors.white.withValues(alpha: isDark ? 0.03 : 0.38),
                       Colors.transparent,
-                      Colors.black.withValues(alpha: isDark ? 0.12 : 0.02),
+                      Colors.black.withValues(alpha: isDark ? 0.15 : 0.03),
                     ],
                   ),
                 ),
@@ -99,7 +92,7 @@ class _GlowOrb extends StatelessWidget {
       alignment: alignment,
       child: IgnorePointer(
         child: ImageFiltered(
-          imageFilter: ImageFilter.blur(sigmaX: 56, sigmaY: 56),
+          imageFilter: ImageFilter.blur(sigmaX: 52, sigmaY: 52),
           child: Container(
             width: size,
             height: size,

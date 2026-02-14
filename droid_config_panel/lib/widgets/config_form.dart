@@ -14,17 +14,27 @@ class ConfigForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Form(
       key: formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          Text(
+            'Metadata',
+            style: theme.textTheme.labelLarge?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 8),
           TextFormField(
             controller: nameController,
             decoration: const InputDecoration(
               labelText: 'Name',
-              hintText: 'Enter configuration name',
-              border: OutlineInputBorder(),
+              hintText: 'example: core-agent',
+              helperText: 'Letters, numbers, hyphens, underscores only',
             ),
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
@@ -44,10 +54,10 @@ class ConfigForm extends StatelessWidget {
             controller: descriptionController,
             decoration: const InputDecoration(
               labelText: 'Description',
-              hintText: 'Enter a brief description',
-              border: OutlineInputBorder(),
+              hintText: 'What this configuration is used for',
             ),
-            maxLines: 2,
+            minLines: 2,
+            maxLines: 3,
           ),
         ],
       ),

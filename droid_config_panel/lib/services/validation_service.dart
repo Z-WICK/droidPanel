@@ -7,7 +7,7 @@ class ValidationService {
   final FileService _fileService;
 
   ValidationService({FileService? fileService})
-      : _fileService = fileService ?? FileService();
+    : _fileService = fileService ?? FileService();
 
   Future<ValidationResult> validate({
     required String content,
@@ -17,10 +17,12 @@ class ValidationService {
     final warnings = <ValidationError>[];
 
     if (content.trim().isEmpty) {
-      errors.add(const ValidationError(
-        message: 'Configuration content cannot be empty',
-        severity: ValidationSeverity.error,
-      ));
+      errors.add(
+        const ValidationError(
+          message: 'Configuration content cannot be empty',
+          severity: ValidationSeverity.error,
+        ),
+      );
       return ValidationResult.invalid(errors);
     }
 
@@ -65,32 +67,38 @@ class ValidationService {
     final parsed = YamlUtils.parseMarkdownWithFrontmatter(content);
 
     if (parsed.frontmatter == null) {
-      errors.add(const ValidationError(
-        message: 'Missing YAML frontmatter (must start with ---)',
-        line: 1,
-        severity: ValidationSeverity.error,
-      ));
+      errors.add(
+        const ValidationError(
+          message: 'Missing YAML frontmatter (must start with ---)',
+          line: 1,
+          severity: ValidationSeverity.error,
+        ),
+      );
       return;
     }
 
     final frontmatter = parsed.frontmatter!;
 
-    if (!frontmatter.containsKey('name') || 
-        frontmatter['name'] == null || 
+    if (!frontmatter.containsKey('name') ||
+        frontmatter['name'] == null ||
         frontmatter['name'].toString().trim().isEmpty) {
-      errors.add(const ValidationError(
-        message: 'Required field "name" is missing or empty in frontmatter',
-        severity: ValidationSeverity.error,
-      ));
+      errors.add(
+        const ValidationError(
+          message: 'Required field "name" is missing or empty in frontmatter',
+          severity: ValidationSeverity.error,
+        ),
+      );
     }
 
-    if (!frontmatter.containsKey('description') || 
-        frontmatter['description'] == null || 
+    if (!frontmatter.containsKey('description') ||
+        frontmatter['description'] == null ||
         frontmatter['description'].toString().trim().isEmpty) {
-      warnings.add(const ValidationError(
-        message: 'Field "description" is recommended but missing',
-        severity: ValidationSeverity.warning,
-      ));
+      warnings.add(
+        const ValidationError(
+          message: 'Field "description" is recommended but missing',
+          severity: ValidationSeverity.warning,
+        ),
+      );
     }
   }
 
@@ -103,43 +111,56 @@ class ValidationService {
     final parsed = YamlUtils.parseYaml(content);
 
     if (parsed == null) {
-      errors.add(const ValidationError(
-        message: 'Invalid YAML syntax',
-        severity: ValidationSeverity.error,
-      ));
+      errors.add(
+        const ValidationError(
+          message: 'Invalid YAML syntax',
+          severity: ValidationSeverity.error,
+        ),
+      );
       return;
     }
 
-    if (!parsed.containsKey('name') || 
-        parsed['name'] == null || 
+    if (!parsed.containsKey('name') ||
+        parsed['name'] == null ||
         parsed['name'].toString().trim().isEmpty) {
-      errors.add(const ValidationError(
-        message: 'Required field "name" is missing or empty',
-        severity: ValidationSeverity.error,
-      ));
+      errors.add(
+        const ValidationError(
+          message: 'Required field "name" is missing or empty',
+          severity: ValidationSeverity.error,
+        ),
+      );
     }
 
     switch (type) {
       case ConfigurationType.hook:
         if (!parsed.containsKey('event')) {
-          errors.add(const ValidationError(
-            message: 'Required field "event" is missing for Hook configuration',
-            severity: ValidationSeverity.error,
-          ));
+          errors.add(
+            const ValidationError(
+              message:
+                  'Required field "event" is missing for Hook configuration',
+              severity: ValidationSeverity.error,
+            ),
+          );
         }
         if (!parsed.containsKey('action')) {
-          errors.add(const ValidationError(
-            message: 'Required field "action" is missing for Hook configuration',
-            severity: ValidationSeverity.error,
-          ));
+          errors.add(
+            const ValidationError(
+              message:
+                  'Required field "action" is missing for Hook configuration',
+              severity: ValidationSeverity.error,
+            ),
+          );
         }
         break;
       case ConfigurationType.mcpServer:
         if (!parsed.containsKey('command') && !parsed.containsKey('url')) {
-          errors.add(const ValidationError(
-            message: 'Either "command" or "url" is required for MCP Server configuration',
-            severity: ValidationSeverity.error,
-          ));
+          errors.add(
+            const ValidationError(
+              message:
+                  'Either "command" or "url" is required for MCP Server configuration',
+              severity: ValidationSeverity.error,
+            ),
+          );
         }
         break;
       default:

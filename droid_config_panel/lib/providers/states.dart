@@ -26,7 +26,9 @@ class ConfigurationState {
       configurations: configurations ?? this.configurations,
       isLoading: isLoading ?? this.isLoading,
       error: clearError ? null : (error ?? this.error),
-      selectedConfiguration: clearSelection ? null : (selectedConfiguration ?? this.selectedConfiguration),
+      selectedConfiguration: clearSelection
+          ? null
+          : (selectedConfiguration ?? this.selectedConfiguration),
     );
   }
 
@@ -68,8 +70,12 @@ class FilterState {
     return FilterState(
       searchQuery: searchQuery ?? this.searchQuery,
       typeFilter: clearTypeFilter ? null : (typeFilter ?? this.typeFilter),
-      locationFilter: clearLocationFilter ? null : (locationFilter ?? this.locationFilter),
-      statusFilter: clearStatusFilter ? null : (statusFilter ?? this.statusFilter),
+      locationFilter: clearLocationFilter
+          ? null
+          : (locationFilter ?? this.locationFilter),
+      statusFilter: clearStatusFilter
+          ? null
+          : (statusFilter ?? this.statusFilter),
     );
   }
 

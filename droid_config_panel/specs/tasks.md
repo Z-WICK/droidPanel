@@ -186,14 +186,14 @@ All paths relative to `droid_config_panel/` Flutter project root.
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T068 [P] Add app icon and window title configuration in macos/Runner/
-- [ ] T069 [P] Add keyboard shortcuts (Cmd+N for new, Cmd+S for save, Cmd+Delete for delete)
+- [x] T068 [P] Add app icon and window title configuration in macos/Runner/
+- [x] T069 [P] Add keyboard shortcuts (Cmd+N for new, Cmd+S for save, Cmd+Delete for delete)
 - [x] T070 [P] Add loading states for all async operations
 - [x] T071 [P] Add error handling for file system permission issues
 - [x] T072 Handle edge case: create directories if .factory/ or ~/.factory/ don't exist
 - [x] T073 Handle edge case: display corrupted/unreadable files with error indicator
 - [x] T074 Add refresh button to reload configurations from disk
-- [ ] T075 Run quickstart.md validation scenarios manually
+- [x] T075 Run quickstart.md validation scenarios manually
 - [x] T076 Build release with `flutter build macos --release`
 
 ---

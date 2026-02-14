@@ -40,7 +40,8 @@ class YamlUtils {
     }).toList();
   }
 
-  static ({Map<String, dynamic>? frontmatter, String body}) parseMarkdownWithFrontmatter(String content) {
+  static ({Map<String, dynamic>? frontmatter, String body})
+  parseMarkdownWithFrontmatter(String content) {
     final lines = content.split('\n');
     if (lines.isEmpty || lines.first.trim() != '---') {
       return (frontmatter: null, body: content);
@@ -65,7 +66,10 @@ class YamlUtils {
     return (frontmatter: frontmatter, body: bodyContent);
   }
 
-  static String generateYamlString(Map<String, dynamic> data, {int indent = 0}) {
+  static String generateYamlString(
+    Map<String, dynamic> data, {
+    int indent = 0,
+  }) {
     final buffer = StringBuffer();
     final prefix = '  ' * indent;
 
@@ -99,7 +103,10 @@ class YamlUtils {
     return buffer.toString();
   }
 
-  static String generateMarkdownWithFrontmatter(Map<String, dynamic> frontmatter, String body) {
+  static String generateMarkdownWithFrontmatter(
+    Map<String, dynamic> frontmatter,
+    String body,
+  ) {
     final buffer = StringBuffer();
     buffer.writeln('---');
     buffer.write(generateYamlString(frontmatter));

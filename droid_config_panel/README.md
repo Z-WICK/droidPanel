@@ -25,7 +25,7 @@ flutter pub get
 flutter build macos --release
 ```
 
-构建产物在 `build/macos/Build/Products/Release/droid_config_panel.app`
+构建产物在 `build/macos/Build/Products/Release/Droid Config Panel.app`
 
 ### 直接运行
 
@@ -45,6 +45,18 @@ flutter build macos --release
 - Flutter Desktop (macOS)
 - Riverpod 状态管理
 - YAML/JSON 解析
+
+## 测试
+
+```bash
+cd droid_config_panel
+flutter analyze
+flutter test
+flutter test integration_test/configuration_flow_test.dart
+```
+
+- `flutter test`：服务层与状态管理单元测试
+- `integration_test/configuration_flow_test.dart`：UI 端到端流程（创建、搜索、编辑、删除）
 
 ## License
 

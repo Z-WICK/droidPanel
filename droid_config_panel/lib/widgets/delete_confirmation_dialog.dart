@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:droid_config_panel/models/configuration.dart';
+import 'package:droid_config_panel/widgets/glass_surface.dart';
 
 class DeleteConfirmationDialog extends StatelessWidget {
   final Configuration configuration;
 
-  const DeleteConfirmationDialog({
-    super.key,
-    required this.configuration,
-  });
+  const DeleteConfirmationDialog({super.key, required this.configuration});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return AlertDialog(
       title: const Text('Delete Configuration'),
@@ -24,12 +23,15 @@ class DeleteConfirmationDialog extends StatelessWidget {
             style: theme.textTheme.bodyLarge,
           ),
           const SizedBox(height: 16),
-          Container(
+          GlassSurface(
+            borderRadius: 14,
+            blur: 14,
             padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.errorContainer.withAlpha(50),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: theme.colorScheme.error.withAlpha(100)),
+            tintColor: theme.colorScheme.error.withValues(
+              alpha: isDark ? 0.16 : 0.08,
+            ),
+            borderColor: theme.colorScheme.error.withValues(
+              alpha: isDark ? 0.6 : 0.4,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

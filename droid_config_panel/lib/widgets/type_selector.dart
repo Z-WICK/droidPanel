@@ -14,7 +14,8 @@ class TypeSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<ConfigurationType>(
-      value: selectedType,
+      key: ValueKey(selectedType),
+      initialValue: selectedType,
       decoration: const InputDecoration(
         labelText: 'Configuration Type',
         border: OutlineInputBorder(),

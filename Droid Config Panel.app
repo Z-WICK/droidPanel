@@ -1,1 +1,1 @@
-/Users/wick/Documents/claude_work/Droid_Configuration_Manage/droid_config_panel/build/macos/Build/Products/Release/droid_config_panel.app
+/Users/wick/Documents/vibe_codeing/my_project/droidPanel/droid_config_panel/build/macos/Build/Products/Release/Droid Config Panel.app

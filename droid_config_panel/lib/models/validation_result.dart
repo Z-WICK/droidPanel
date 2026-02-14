@@ -15,7 +15,9 @@ class ValidationError {
 
   @override
   String toString() {
-    final location = line != null ? ' (line $line${column != null ? ', col $column' : ''})' : '';
+    final location = line != null
+        ? ' (line $line${column != null ? ', col $column' : ''})'
+        : '';
     return '${severity.displayName}: $message$location';
   }
 }
@@ -37,7 +39,10 @@ class ValidationResult {
     return const ValidationResult(status: ValidationStatus.valid);
   }
 
-  factory ValidationResult.invalid(List<ValidationError> errors, [List<ValidationError> warnings = const []]) {
+  factory ValidationResult.invalid(
+    List<ValidationError> errors, [
+    List<ValidationError> warnings = const [],
+  ]) {
     return ValidationResult(
       status: ValidationStatus.invalid,
       errors: errors,

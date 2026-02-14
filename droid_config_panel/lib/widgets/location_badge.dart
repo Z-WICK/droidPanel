@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:droid_config_panel/models/enums.dart';
 
 class LocationBadge extends StatelessWidget {
@@ -10,23 +11,34 @@ class LocationBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isProject = location == ConfigurationLocation.project;
+    final color = isProject
+        ? theme.colorScheme.primary
+        : theme.colorScheme.secondary;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
       decoration: BoxDecoration(
-        color: isProject
-            ? theme.colorScheme.primaryContainer
-            : theme.colorScheme.secondaryContainer,
-        borderRadius: BorderRadius.circular(4),
+        color: color.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
-      child: Text(
-        location.displayName,
-        style: theme.textTheme.labelSmall?.copyWith(
-          color: isProject
-              ? theme.colorScheme.onPrimaryContainer
-              : theme.colorScheme.onSecondaryContainer,
-          fontWeight: FontWeight.w500,
-        ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            isProject ? Icons.folder_outlined : Icons.person_outline,
+            size: 13,
+            color: color,
+          ),
+          const SizedBox(width: 4),
+          Text(
+            location.displayName,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: color,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
       ),
     );
   }

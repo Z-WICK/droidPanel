@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:re_editor/re_editor.dart';
+import 'package:droid_config_panel/widgets/glass_surface.dart';
 
 class CodeEditorWidget extends StatefulWidget {
   final String initialContent;
@@ -55,34 +56,44 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: theme.colorScheme.outline),
-        borderRadius: BorderRadius.circular(8),
+    return GlassSurface(
+      borderRadius: 18,
+      blur: 18,
+      showInnerGlow: false,
+      padding: const EdgeInsets.all(1.2),
+      tintColor: theme.colorScheme.surface.withValues(
+        alpha: isDark ? 0.28 : 0.4,
+      ),
+      borderColor: theme.colorScheme.outlineVariant.withValues(
+        alpha: isDark ? 0.56 : 0.48,
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: CodeEditor(
-          controller: _controller,
-          readOnly: widget.readOnly,
-          style: CodeEditorStyle(
-            fontSize: 14,
-            fontFamily: 'monospace',
-            backgroundColor: isDark
-                ? theme.colorScheme.surfaceContainerHighest
-                : theme.colorScheme.surface,
-            textColor: theme.colorScheme.onSurface,
+        borderRadius: BorderRadius.circular(16),
+        child: ColoredBox(
+          color: theme.colorScheme.surface.withValues(
+            alpha: isDark ? 0.52 : 0.66,
           ),
-          indicatorBuilder: (context, editingController, chunkController, notifier) {
-            return Row(
-              children: [
-                DefaultCodeLineNumber(
-                  controller: editingController,
-                  notifier: notifier,
-                ),
-              ],
-            );
-          },
+          child: CodeEditor(
+            controller: _controller,
+            readOnly: widget.readOnly,
+            style: CodeEditorStyle(
+              fontSize: 14,
+              fontFamily: 'monospace',
+              backgroundColor: Colors.transparent,
+              textColor: theme.colorScheme.onSurface,
+            ),
+            indicatorBuilder:
+                (context, editingController, chunkController, notifier) {
+                  return Row(
+                    children: [
+                      DefaultCodeLineNumber(
+                        controller: editingController,
+                        notifier: notifier,
+                      ),
+                    ],
+                  );
+                },
+          ),
         ),
       ),
     );

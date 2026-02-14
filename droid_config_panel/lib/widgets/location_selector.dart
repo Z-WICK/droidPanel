@@ -14,7 +14,8 @@ class LocationSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<ConfigurationLocation>(
-      value: selectedLocation,
+      key: ValueKey(selectedLocation),
+      initialValue: selectedLocation,
       decoration: const InputDecoration(
         labelText: 'Storage Location',
         border: OutlineInputBorder(),

@@ -16,29 +16,24 @@ final configServiceProvider = Provider<ConfigService>((ref) {
 
 final configurationStateProvider =
     StateNotifierProvider<ConfigurationNotifier, ConfigurationState>((ref) {
-  final configService = ref.watch(configServiceProvider);
-  return ConfigurationNotifier(configService);
-});
+      final configService = ref.watch(configServiceProvider);
+      return ConfigurationNotifier(configService);
+    });
 
 class ConfigurationNotifier extends StateNotifier<ConfigurationState> {
   final ConfigService _configService;
 
-  ConfigurationNotifier(this._configService) : super(ConfigurationState.initial());
+  ConfigurationNotifier(this._configService)
+    : super(ConfigurationState.initial());
 
   Future<void> loadConfigurations() async {
     state = state.copyWith(isLoading: true, clearError: true);
 
     try {
       final configurations = await _configService.getAllConfigurations();
-      state = state.copyWith(
-        configurations: configurations,
-        isLoading: false,
-      );
+      state = state.copyWith(configurations: configurations, isLoading: false);
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 
@@ -47,32 +42,24 @@ class ConfigurationNotifier extends StateNotifier<ConfigurationState> {
 
     try {
       final configurations = await _configService.getConfigurationsByType(type);
-      state = state.copyWith(
-        configurations: configurations,
-        isLoading: false,
-      );
+      state = state.copyWith(configurations: configurations, isLoading: false);
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 
-  Future<void> loadConfigurationsByLocation(ConfigurationLocation location) async {
+  Future<void> loadConfigurationsByLocation(
+    ConfigurationLocation location,
+  ) async {
     state = state.copyWith(isLoading: true, clearError: true);
 
     try {
-      final configurations = await _configService.getConfigurationsByLocation(location);
-      state = state.copyWith(
-        configurations: configurations,
-        isLoading: false,
+      final configurations = await _configService.getConfigurationsByLocation(
+        location,
       );
+      state = state.copyWith(configurations: configurations, isLoading: false);
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 
@@ -102,10 +89,7 @@ class ConfigurationNotifier extends StateNotifier<ConfigurationState> {
       );
       await loadConfigurations();
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoading: false, error: e.toString());
       rethrow;
     }
   }
@@ -115,6 +99,7 @@ class ConfigurationNotifier extends StateNotifier<ConfigurationState> {
     required String content,
     String? name,
     String? description,
+    DateTime? expectedModifiedAt,
   }) async {
     state = state.copyWith(isLoading: true, clearError: true);
 
@@ -124,13 +109,11 @@ class ConfigurationNotifier extends StateNotifier<ConfigurationState> {
         content: content,
         name: name,
         description: description,
+        expectedModifiedAt: expectedModifiedAt,
       );
       await loadConfigurations();
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoading: false, error: e.toString());
       rethrow;
     }
   }
@@ -143,10 +126,7 @@ class ConfigurationNotifier extends StateNotifier<ConfigurationState> {
       state = state.copyWith(clearSelection: true);
       await loadConfigurations();
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoading: false, error: e.toString());
       rethrow;
     }
   }

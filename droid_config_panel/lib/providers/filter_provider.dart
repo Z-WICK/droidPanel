@@ -2,7 +2,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:droid_config_panel/models/enums.dart';
 import 'package:droid_config_panel/providers/states.dart';
 
-final filterStateProvider = StateNotifierProvider<FilterNotifier, FilterState>((ref) {
+final filterStateProvider = StateNotifierProvider<FilterNotifier, FilterState>((
+  ref,
+) {
   return FilterNotifier();
 });
 
@@ -14,6 +16,11 @@ class FilterNotifier extends StateNotifier<FilterState> {
   }
 
   void setTypeFilter(ConfigurationType? type) {
+    if (type == null) {
+      state = state.copyWith(clearTypeFilter: true);
+      return;
+    }
+
     if (type == state.typeFilter) {
       state = state.copyWith(clearTypeFilter: true);
     } else {
@@ -22,6 +29,11 @@ class FilterNotifier extends StateNotifier<FilterState> {
   }
 
   void setLocationFilter(ConfigurationLocation? location) {
+    if (location == null) {
+      state = state.copyWith(clearLocationFilter: true);
+      return;
+    }
+
     if (location == state.locationFilter) {
       state = state.copyWith(clearLocationFilter: true);
     } else {
@@ -30,6 +42,11 @@ class FilterNotifier extends StateNotifier<FilterState> {
   }
 
   void setStatusFilter(ValidationStatus? status) {
+    if (status == null) {
+      state = state.copyWith(clearStatusFilter: true);
+      return;
+    }
+
     if (status == state.statusFilter) {
       state = state.copyWith(clearStatusFilter: true);
     } else {

@@ -13,7 +13,9 @@ class SearchService {
     final lowerQuery = query.toLowerCase();
     return configurations.where((config) {
       return config.name.toLowerCase().contains(lowerQuery) ||
-          config.description.toLowerCase().contains(lowerQuery);
+          config.description.toLowerCase().contains(lowerQuery) ||
+          config.type.displayName.toLowerCase().contains(lowerQuery) ||
+          config.location.displayName.toLowerCase().contains(lowerQuery);
     }).toList();
   }
 

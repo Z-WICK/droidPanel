@@ -33,8 +33,7 @@ class ConfigService {
       }
     }
 
-    _sortConfigurations(configurations);
-    return configurations;
+    return _deduplicateOverlappingLocations(configurations);
   }
 
   Future<List<Configuration>> getConfigurationsByType(
@@ -50,8 +49,7 @@ class ConfigService {
       configurations.addAll(configs);
     }
 
-    _sortConfigurations(configurations);
-    return configurations;
+    return _deduplicateOverlappingLocations(configurations);
   }
 
   Future<List<Configuration>> getConfigurationsByLocation(
@@ -932,5 +930,42 @@ class ConfigService {
 
       return a.name.toLowerCase().compareTo(b.name.toLowerCase());
     });
+  }
+
+  List<Configuration> _deduplicateOverlappingLocations(
+    List<Configuration> configurations,
+  ) {
+    final deduplicated = <String, Configuration>{};
+
+    for (final config in configurations) {
+      final key = _buildLocationAgnosticKey(config);
+      final existing = deduplicated[key];
+
+      if (existing == null) {
+        deduplicated[key] = config;
+        continue;
+      }
+
+      // When project/personal accidentally point to the same .factory path,
+      // keep a single entry and prefer project scope.
+      if (existing.location == ConfigurationLocation.personal &&
+          config.location == ConfigurationLocation.project) {
+        deduplicated[key] = config;
+      }
+    }
+
+    final result = deduplicated.values.toList();
+    _sortConfigurations(result);
+    return result;
+  }
+
+  String _buildLocationAgnosticKey(Configuration config) {
+    final normalizedPath = config.filePath.replaceAll('\\', '/').toLowerCase();
+    return [
+      config.type.name,
+      normalizedPath,
+      config.name,
+      config.content,
+    ].join('|');
   }
 }

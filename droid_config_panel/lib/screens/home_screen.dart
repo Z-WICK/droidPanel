@@ -1,16 +1,21 @@
+import 'dart:io' as io;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path/path.dart' as p;
 
 import 'package:droid_config_panel/models/configuration.dart';
 import 'package:droid_config_panel/models/enums.dart';
 import 'package:droid_config_panel/providers/config_provider.dart';
 import 'package:droid_config_panel/providers/filter_provider.dart';
+import 'package:droid_config_panel/providers/project_scope_provider.dart';
 import 'package:droid_config_panel/providers/providers.dart';
 import 'package:droid_config_panel/providers/states.dart';
 import 'package:droid_config_panel/screens/create_screen.dart';
 import 'package:droid_config_panel/screens/edit_screen.dart';
 import 'package:droid_config_panel/theme/app_theme.dart';
+import 'package:droid_config_panel/utils/constants.dart';
 import 'package:droid_config_panel/widgets/app_background.dart';
 import 'package:droid_config_panel/widgets/config_list_item.dart';
 import 'package:droid_config_panel/widgets/delete_confirmation_dialog.dart';
@@ -57,6 +62,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final configState = ref.watch(configurationStateProvider);
     final filterState = ref.watch(filterStateProvider);
     final searchService = ref.watch(searchServiceProvider);
+    final activeProjectPath = ref.watch(activeProjectPathProvider);
     final disableAnimations =
         MediaQuery.maybeOf(context)?.disableAnimations ?? false;
 
@@ -131,7 +137,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 constraints: const BoxConstraints(maxWidth: 1240),
                 child: LayoutBuilder(
                   builder: (context, constraints) {
-                    final compact = constraints.maxWidth < 1040;
                     final listFrame = EntranceTransition(
                       delay: const Duration(milliseconds: 90),
                       child: _ResultFrame(
@@ -153,6 +158,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 configState: configState,
                                 filterState: filterState,
                                 configurations: filteredConfigurations,
+                                activeProjectPath: activeProjectPath,
                               ),
                             ),
                             child: _buildContent(
@@ -167,27 +173,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                     final topSections = _buildTopSections(
                       filterState: filterState,
+                      activeProjectPath: activeProjectPath,
                     );
-
-                    if (compact) {
-                      return SingleChildScrollView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            ...topSections,
-                            const SizedBox(height: 10),
-                            SizedBox(
-                              height: (constraints.maxHeight * 0.76).clamp(
-                                400.0,
-                                720.0,
-                              ),
-                              child: listFrame,
-                            ),
-                          ],
-                        ),
-                      );
-                    }
 
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -310,8 +297,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return grouped;
   }
 
-  List<Widget> _buildTopSections({required FilterState filterState}) {
+  List<Widget> _buildTopSections({
+    required FilterState filterState,
+    required String activeProjectPath,
+  }) {
     return [
+      EntranceTransition(
+        delay: const Duration(milliseconds: 10),
+        child: _buildProjectScopeBar(activeProjectPath),
+      ),
+      const SizedBox(height: 8),
       EntranceTransition(
         delay: const Duration(milliseconds: 20),
         child: SearchBarWidget(
@@ -347,10 +342,56 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     ];
   }
 
+  Widget _buildProjectScopeBar(String activeProjectPath) {
+    final theme = Theme.of(context);
+    final fallbackCurrentPath = _resolveDefaultProjectPath();
+    final canUseCurrentPath = activeProjectPath != fallbackCurrentPath;
+
+    return GlassSurface(
+      borderRadius: 14,
+      blur: 16,
+      padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+      child: Row(
+        children: [
+          Icon(
+            Icons.folder_copy_outlined,
+            size: 16,
+            color: theme.colorScheme.primary,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Tooltip(
+              message: activeProjectPath,
+              child: Text(
+                'Project: $activeProjectPath',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          TextButton(
+            onPressed: _showProjectSwitchDialog,
+            child: const Text('Switch'),
+          ),
+          TextButton(
+            onPressed: canUseCurrentPath ? _switchToCurrentDirectory : null,
+            child: const Text('Current'),
+          ),
+        ],
+      ),
+    );
+  }
+
   String _contentSignature({
     required ConfigurationState configState,
     required FilterState filterState,
     required List<Configuration> configurations,
+    required String activeProjectPath,
   }) {
     if (configState.isLoading) {
       return 'loading';
@@ -367,11 +408,128 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       filterState.locationFilter?.name ?? 'all',
       filterState.statusFilter?.name ?? 'all',
       configurations.length,
+      activeProjectPath,
     ].join('|');
   }
 
   void _refresh() {
     ref.read(configurationStateProvider.notifier).loadConfigurations();
+  }
+
+  void _switchToCurrentDirectory() {
+    _applyProjectScope(_resolveDefaultProjectPath());
+  }
+
+  Future<void> _showProjectSwitchDialog() async {
+    final controller = TextEditingController(
+      text: ref.read(activeProjectPathProvider),
+    );
+    String? errorText;
+
+    final selectedPath = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (dialogContext, setDialogState) {
+            void submit() {
+              final normalizedPath = _normalizeProjectPath(controller.text);
+              if (normalizedPath == null) {
+                setDialogState(() {
+                  errorText = 'Project path is required';
+                });
+                return;
+              }
+              if (!io.Directory(normalizedPath).existsSync()) {
+                setDialogState(() {
+                  errorText = 'Directory does not exist';
+                });
+                return;
+              }
+              Navigator.of(dialogContext).pop(normalizedPath);
+            }
+
+            return AlertDialog(
+              title: const Text('Switch Active Project'),
+              content: TextField(
+                controller: controller,
+                autofocus: true,
+                decoration: InputDecoration(
+                  labelText: 'Project root path',
+                  hintText: '~/workspace/project',
+                  errorText: errorText,
+                ),
+                onSubmitted: (_) => submit(),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(dialogContext).pop(),
+                  child: const Text('Cancel'),
+                ),
+                FilledButton(onPressed: submit, child: const Text('Switch')),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    controller.dispose();
+    if (selectedPath == null) {
+      return;
+    }
+
+    _applyProjectScope(selectedPath);
+  }
+
+  void _applyProjectScope(String path) {
+    final normalizedPath = _normalizeProjectPath(path);
+    if (normalizedPath == null) {
+      return;
+    }
+    if (!io.Directory(normalizedPath).existsSync()) {
+      return;
+    }
+
+    ref.read(activeProjectPathProvider.notifier).state = normalizedPath;
+    _refresh();
+  }
+
+  String? _normalizeProjectPath(String rawPath) {
+    final trimmed = rawPath.trim();
+    if (trimmed.isEmpty) {
+      return null;
+    }
+
+    final expanded = _expandHomePath(trimmed);
+    final absolute = io.Directory(expanded).absolute.path;
+    return p.normalize(absolute);
+  }
+
+  String _resolveDefaultProjectPath() {
+    final currentPath = p.normalize(io.Directory.current.absolute.path);
+    if (currentPath != p.separator) {
+      return currentPath;
+    }
+
+    final homePath = AppConstants.homeDirectory.trim();
+    if (homePath.isNotEmpty) {
+      final documentsPath = p.normalize(p.join(homePath, 'Documents'));
+      if (io.Directory(documentsPath).existsSync()) {
+        return documentsPath;
+      }
+      return p.normalize(homePath);
+    }
+    return currentPath;
+  }
+
+  String _expandHomePath(String path) {
+    if (path == '~') {
+      return AppConstants.homeDirectory;
+    }
+    if (path.startsWith('~/')) {
+      return p.join(AppConstants.homeDirectory, path.substring(2));
+    }
+    return path;
   }
 
   void _markInteracted(Configuration config) {

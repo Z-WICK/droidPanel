@@ -67,7 +67,12 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
           controller: widget.controller,
           focusNode: widget.focusNode,
           textInputAction: TextInputAction.search,
+          cursorWidth: 1.6,
           decoration: InputDecoration(
+            filled: false,
+            fillColor: Colors.transparent,
+            hoverColor: Colors.transparent,
+            focusColor: Colors.transparent,
             hintText: 'Search configurations',
             prefixIcon: const Icon(Icons.search_rounded, size: 20),
             suffixIcon: widget.controller.text.isNotEmpty
@@ -95,6 +100,9 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
             border: InputBorder.none,
             enabledBorder: InputBorder.none,
             focusedBorder: InputBorder.none,
+            errorBorder: InputBorder.none,
+            focusedErrorBorder: InputBorder.none,
+            disabledBorder: InputBorder.none,
           ),
           onChanged: widget.onChanged,
         ),

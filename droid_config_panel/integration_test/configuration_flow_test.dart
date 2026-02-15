@@ -48,7 +48,7 @@ void main() {
 
       expect(find.text('No configurations found'), findsOneWidget);
 
-      await tester.tap(find.text('New (⌘N)'));
+      await tester.tap(_newButtonFinder());
       await tester.pumpAndSettle();
 
       final textFields = find.byType(TextFormField);
@@ -73,7 +73,7 @@ void main() {
         findsOneWidget,
       );
 
-      final searchField = find.byType(TextField).first;
+      final searchField = _searchFieldFinder();
       await tester.enterText(searchField, 'unmatched-query');
       await tester.pumpAndSettle();
       expect(find.text('No matching results'), findsOneWidget);
@@ -122,6 +122,19 @@ void main() {
       );
     });
   });
+}
+
+Finder _newButtonFinder() {
+  return find.widgetWithText(FilledButton, 'New');
+}
+
+Finder _searchFieldFinder() {
+  return find.byWidgetPredicate(
+    (widget) =>
+        widget is TextField &&
+        widget.decoration?.hintText == 'Search configurations',
+    description: 'Search configurations text field',
+  );
 }
 
 Future<void> _pumpApp(

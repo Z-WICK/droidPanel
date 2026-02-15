@@ -140,7 +140,7 @@ Future<void> _createConfiguration(
   required String name,
   required String description,
 }) async {
-  await tester.tap(find.text('New (⌘N)'));
+  await tester.tap(_newButtonFinder());
   await tester.pumpAndSettle();
 
   await tester.tap(
@@ -202,6 +202,10 @@ Future<void> _deleteConfiguration(
   await tester.pumpAndSettle();
   await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
   await tester.pumpAndSettle(const Duration(seconds: 2));
+}
+
+Finder _newButtonFinder() {
+  return find.widgetWithText(FilledButton, 'New');
 }
 
 Future<void> _pumpApp(

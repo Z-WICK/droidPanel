@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:droid_config_panel/models/enums.dart';
 import 'package:droid_config_panel/models/validation_result.dart';
 import 'package:droid_config_panel/providers/config_provider.dart';
+import 'package:droid_config_panel/providers/project_scope_provider.dart';
 import 'package:droid_config_panel/providers/providers.dart';
 import 'package:droid_config_panel/widgets/app_background.dart';
 import 'package:droid_config_panel/widgets/code_editor.dart';
@@ -203,6 +204,7 @@ Skill instructions here.
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final activeProjectPath = ref.watch(activeProjectPathProvider);
 
     return CallbackShortcuts(
       bindings: {
@@ -260,7 +262,11 @@ Skill instructions here.
                 child: LayoutBuilder(
                   builder: (context, constraints) {
                     final compact = constraints.maxWidth < 980;
-                    final metaColumn = _buildMetaPanel(theme, isDark);
+                    final metaColumn = _buildMetaPanel(
+                      theme,
+                      isDark,
+                      activeProjectPath,
+                    );
                     final editorPanel = _buildEditorPanel(
                       theme,
                       isDark,
@@ -320,7 +326,11 @@ Skill instructions here.
     );
   }
 
-  Widget _buildMetaPanel(ThemeData theme, bool isDark) {
+  Widget _buildMetaPanel(
+    ThemeData theme,
+    bool isDark,
+    String activeProjectPath,
+  ) {
     return EntranceTransition(
       delay: const Duration(milliseconds: 20),
       child: GlassSurface(
@@ -362,10 +372,22 @@ Skill instructions here.
             const SizedBox(height: 12),
             LocationSelector(
               selectedLocation: _selectedLocation,
+              activeProjectPath: activeProjectPath,
               onChanged: (location) {
                 setState(() => _selectedLocation = location);
               },
             ),
+            if (_selectedLocation == ConfigurationLocation.project) ...[
+              const SizedBox(height: 8),
+              Text(
+                'Current project: $activeProjectPath',
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
             const SizedBox(height: 14),
             ConfigForm(
               formKey: _formKey,

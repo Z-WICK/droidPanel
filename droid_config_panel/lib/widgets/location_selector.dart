@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:path/path.dart' as p;
 
 import 'package:droid_config_panel/models/enums.dart';
 
 class LocationSelector extends StatelessWidget {
   final ConfigurationLocation? selectedLocation;
+  final String? activeProjectPath;
   final ValueChanged<ConfigurationLocation?> onChanged;
 
   const LocationSelector({
     super.key,
     required this.selectedLocation,
+    this.activeProjectPath,
     required this.onChanged,
   });
 
@@ -38,7 +41,7 @@ class LocationSelector extends StatelessWidget {
                     : Icons.person_outline_rounded,
                 label: location.displayName,
                 pathHint: location == ConfigurationLocation.project
-                    ? '.factory/'
+                    ? _buildProjectPathHint(activeProjectPath)
                     : '~/.factory/',
                 selected: selectedLocation == location,
                 onTap: () =>
@@ -48,6 +51,22 @@ class LocationSelector extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  String _buildProjectPathHint(String? projectPath) {
+    if (projectPath == null || projectPath.trim().isEmpty) {
+      return '.factory/';
+    }
+
+    final normalized = p.normalize(projectPath);
+    final projectName = p.basename(normalized);
+    if (projectName.isEmpty ||
+        projectName == '.' ||
+        projectName == p.separator) {
+      return '.factory/';
+    }
+
+    return '$projectName/.factory/';
   }
 }
 
